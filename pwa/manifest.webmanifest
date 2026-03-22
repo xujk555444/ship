@@ -1,14 +1,15 @@
 {
   "name": "报装信息生成工具",
   "short_name": "报装工具",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#f5efe4",
   "theme_color": "#17324d",
   "description": "用于生成报装模板，支持手机网页与主屏幕安装。",
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "./icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"

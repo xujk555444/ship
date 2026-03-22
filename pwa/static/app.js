@@ -1,4 +1,6 @@
-const STORAGE_KEY = "shipment-pwa-state-v1";
+import { TONNAGE_REMINDER_THRESHOLD, generateShipment, resetState } from "./shipment-core.js";
+
+const STORAGE_KEY = "shipment-pwa-state-v2";
 
 const elements = {
   bigShipInput: document.querySelector("#bigShipInput"),
@@ -14,21 +16,25 @@ const elements = {
   copyButton: document.querySelector("#copyButton"),
 };
 
+function getEmptyState() {
+  return { big_ship_no: "", flow: "", current_total: 0 };
+}
+
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (!saved) {
-    return { big_ship_no: "", flow: "", current_total: 0 };
+    return getEmptyState();
   }
 
   try {
     const parsed = JSON.parse(saved);
     return {
-      big_ship_no: parsed.big_ship_no || "",
-      flow: parsed.flow || "",
+      big_ship_no: String(parsed.big_ship_no || "").trim(),
+      flow: String(parsed.flow || "").trim(),
       current_total: Number(parsed.current_total || 0),
     };
   } catch {
-    return { big_ship_no: "", flow: "", current_total: 0 };
+    return getEmptyState();
   }
 }
 
@@ -60,31 +66,24 @@ function setStatus(message, tone = "") {
   }
 }
 
-async function generate() {
+function clearStatus() {
+  setStatus("");
+}
+
+function generate() {
   const state = readFormState();
   const rawText = elements.rawInput.value.trim();
 
   try {
-    const response = await fetch("/api/generate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ raw_text: rawText, state }),
-    });
+    const { output, state: updatedState, reminderRequired } = generateShipment(rawText, state);
+    elements.outputText.value = output;
+    writeFormState(updatedState);
+    saveState(updatedState, "结果已生成并保存状态。");
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.detail || "生成失败。");
-    }
-
-    const data = await response.json();
-    elements.outputText.value = data.output;
-    writeFormState(data.state);
-    saveState(data.state, "结果已生成并保存状态。");
-
-    if (data.reminder_required) {
-      const shouldComplete = window.confirm("当前累积已超过80000吨，这条大船是否运完？");
+    if (reminderRequired) {
+      const shouldComplete = window.confirm(`当前累积已超过${TONNAGE_REMINDER_THRESHOLD}吨，这条大船是否运完？`);
       if (shouldComplete) {
-        await resetRun(true);
+        completeRun(true);
       }
     }
   } catch (error) {
@@ -100,30 +99,28 @@ async function copyOutput() {
 
   try {
     await navigator.clipboard.writeText(text);
-    setStatus("结果已复制到剪贴板。", "success");
+    clearStatus();
   } catch {
     elements.outputText.focus();
     elements.outputText.select();
-    document.execCommand("copy");
-    setStatus("结果已复制到剪贴板。", "success");
+    const copied = document.execCommand("copy");
+    if (!copied) {
+      setStatus("复制失败，请手动长按复制。", "error");
+      return;
+    }
+    clearStatus();
   }
 }
 
-async function resetRun(fromReminder = false) {
+function completeRun(fromReminder = false) {
   const confirmed = fromReminder || window.confirm("确定这条大船已经运完吗？会清空大船号、流向和累积。");
   if (!confirmed) {
     return;
   }
 
-  try {
-    const response = await fetch("/api/reset-state", { method: "POST" });
-    const data = await response.json();
-    writeFormState(data.state);
-    saveState(data.state, "当前状态已清空。");
-  } catch {
-    writeFormState({ big_ship_no: "", flow: "", current_total: 0 });
-    saveState({ big_ship_no: "", flow: "", current_total: 0 }, "当前状态已清空。");
-  }
+  const state = resetState();
+  writeFormState(state);
+  saveState(state, "当前状态已清空。");
 }
 
 function clearText() {
@@ -134,7 +131,7 @@ function clearText() {
 
 function installServiceWorker() {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("/service-worker.js").catch(() => {
+    navigator.serviceWorker.register("./service-worker.js").catch(() => {
       setStatus("PWA 缓存注册失败，但不影响继续使用。", "error");
     });
   }
@@ -142,7 +139,7 @@ function installServiceWorker() {
 
 function bindEvents() {
   elements.saveStateButton.addEventListener("click", () => saveState(readFormState()));
-  elements.completeButton.addEventListener("click", () => resetRun(false));
+  elements.completeButton.addEventListener("click", () => completeRun(false));
   elements.clearButton.addEventListener("click", clearText);
   elements.generateButton.addEventListener("click", generate);
   elements.copyButton.addEventListener("click", copyOutput);

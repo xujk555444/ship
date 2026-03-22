@@ -1,11 +1,14 @@
-const CACHE_NAME = "shipment-tool-v1";
+const CACHE_NAME = "shipment-tool-static-v2";
+const BASE_URL = new URL("./", self.registration.scope);
 const ASSETS = [
-  "/",
-  "/manifest.webmanifest",
-  "/icon.svg",
-  "/static/styles.css",
-  "/static/app.js",
-];
+  "",
+  "index.html",
+  "manifest.webmanifest",
+  "icon.svg",
+  "static/styles.css",
+  "static/app.js",
+  "static/shipment-core.js",
+].map((path) => new URL(path, BASE_URL).toString());
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
