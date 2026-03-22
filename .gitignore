@@ -1,0 +1,8 @@
+build/
+dist/
+__pycache__/
+tests/__pycache__/
+*.pyc
+*.spec
+shipment_state.json
+*.xlsx

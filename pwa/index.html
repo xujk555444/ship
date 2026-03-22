@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#17324d">
+    <title>报装信息生成工具</title>
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.svg">
+    <link rel="stylesheet" href="/static/styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <p class="eyebrow">Shipment Message Tool</p>
+        <h1>报装信息生成工具</h1>
+        <p class="intro">iPhone Safari 可直接使用，规则与桌面版保持一致。流向统一读取上方当前状态。</p>
+      </section>
+
+      <section class="card state-card">
+        <div class="card-head">
+          <h2>当前状态</h2>
+          <button id="saveStateButton" class="ghost-button" type="button">保存状态</button>
+        </div>
+        <div class="field-grid">
+          <label class="field">
+            <span>大船号</span>
+            <input id="bigShipInput" type="text" placeholder="例如：九华真诚">
+          </label>
+          <label class="field">
+            <span>流向</span>
+            <input id="flowInput" type="text" placeholder="例如：高栏—都骑">
+          </label>
+          <label class="field">
+            <span>当前累积(吨)</span>
+            <input id="totalInput" type="number" inputmode="numeric" placeholder="例如：3200">
+          </label>
+        </div>
+        <div class="toolbar">
+          <button id="completeButton" class="danger-button" type="button">标记运完</button>
+          <button id="clearButton" class="secondary-button" type="button">清空文本</button>
+        </div>
+      </section>
+
+      <section class="layout">
+        <article class="card">
+          <div class="card-head">
+            <h2>原始信息</h2>
+          </div>
+          <textarea id="rawInput" class="editor" placeholder="示例：&#10;@达峰3013 装煤2800吨&#10;或&#10;船号:福顺855&#10;报装4600吨&#10;电话13729786260&#10;船期:13号"></textarea>
+          <div class="toolbar">
+            <button id="generateButton" class="primary-button" type="button">生成</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-head">
+            <h2>生成结果</h2>
+            <button id="copyButton" class="ghost-button" type="button">复制结果</button>
+          </div>
+          <textarea id="outputText" class="editor" placeholder="生成后的模板会显示在这里"></textarea>
+        </article>
+      </section>
+
+      <section class="notice-row">
+        <p class="notice">规则摘要：第一船累积=报装数；同一大船后续累积递增；超过80000吨会提醒确认是否运完。</p>
+        <p id="statusText" class="status-text" aria-live="polite"></p>
+      </section>
+    </main>
+
+    <script type="module" src="/static/app.js"></script>
+  </body>
+</html>
