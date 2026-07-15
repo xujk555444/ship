@@ -1,4 +1,4 @@
-const CACHE_NAME = "shipment-tool-static-v2";
+const CACHE_NAME = "shipment-tool-static-v3";
 const BASE_URL = new URL("./", self.registration.scope);
 const ASSETS = [
   "",
@@ -8,23 +8,30 @@ const ASSETS = [
   "static/styles.css",
   "static/app.js",
   "static/shipment-core.js",
+  "static/shipment-store.js",
 ].map((path) => new URL(path, BASE_URL).toString());
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)),
+    caches
+      .open(CACHE_NAME)
+      .then((cache) => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting()),
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(
-        keys
-          .filter((key) => key !== CACHE_NAME)
-          .map((key) => caches.delete(key)),
+    Promise.all([
+      caches.keys().then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key !== CACHE_NAME)
+            .map((key) => caches.delete(key)),
+        ),
       ),
-    ),
+      self.clients.claim(),
+    ]),
   );
 });
 

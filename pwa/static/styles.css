@@ -62,6 +62,11 @@ body {
   gap: 16px;
 }
 
+.workspace[hidden],
+[hidden] {
+  display: none !important;
+}
+
 .card {
   border: 1px solid var(--line);
   border-radius: 24px;
@@ -71,8 +76,128 @@ body {
   padding: 18px;
 }
 
+.fleet-card,
 .state-card {
   margin-bottom: 16px;
+}
+
+.fleet-card {
+  overflow: hidden;
+}
+
+.fleet-head {
+  align-items: flex-end;
+}
+
+.fleet-title h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-label {
+  margin: 0 0 4px;
+  color: var(--accent-dark);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.ship-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: rgba(200, 106, 42, 0.14);
+  color: var(--accent-dark);
+  font-size: 0.78rem;
+}
+
+.ship-strip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 2px 2px 8px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+}
+
+.ship-tab {
+  display: flex;
+  flex: 0 0 224px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  min-width: 0;
+  border: 1px solid rgba(23, 50, 77, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.68);
+  color: var(--ink);
+  padding: 14px 15px;
+  text-align: left;
+  scroll-snap-align: start;
+}
+
+.ship-tab.is-active {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 12px 28px rgba(23, 50, 77, 0.2);
+}
+
+.ship-tab-name,
+.ship-tab-flow,
+.ship-tab-total {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ship-tab-name {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ship-tab-flow {
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.ship-tab-total {
+  margin-top: 3px;
+  color: var(--accent-dark);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.ship-tab.is-active .ship-tab-flow {
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.ship-tab.is-active .ship-tab-total {
+  color: #f4b888;
+}
+
+.empty-state {
+  border: 1px dashed rgba(23, 50, 77, 0.22);
+  border-radius: 18px;
+  padding: 22px;
+  color: var(--ink-soft);
+  text-align: center;
+}
+
+.empty-state p {
+  margin: 5px 0 0;
+  line-height: 1.55;
+}
+
+.empty-state .empty-state-title {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .card-head {
@@ -208,6 +333,19 @@ button:active {
   .card {
     border-radius: 20px;
     padding: 16px;
+  }
+
+  .fleet-head {
+    align-items: center;
+  }
+
+  .add-ship-button {
+    padding-inline: 15px;
+    white-space: nowrap;
+  }
+
+  .ship-tab {
+    flex-basis: min(248px, 78vw);
   }
 
   .editor {
