@@ -46,22 +46,28 @@ Service Worker 当前缓存名是 `shipment-tool-static-v4`。新增或删除静
 
 1. Safari 打开线上地址。
 2. 选择“分享 -> 添加到主屏幕”。
-3. 点“新增大船”建立独立船卡，点卡片切换当前大船。
+3. 点“新增大船”建立独立船卡，填写大船号、流向和可选合同号。
+4. 原始信息旁的“清空文本”只清原文；状态区的“清空当前船文本”同时清原文和结果。
 
 电脑迁盘、关机或重启不会影响线上 PWA。发布新版本后无需重装；若仍显示旧版，从任务切换器彻底关闭 Web App 后重新打开。
 
 ## 发布后检查
 
 ```powershell
-$home = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/?check=1"
-$home.StatusCode
-$home.Content -match "在运大船"
+$homeResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/?check=1"
+$homeResponse.StatusCode
+$homeResponse.Content -match 'id="contractInput"'
 
-(Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/service-worker.js?check=1").Content
+$coreResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/static/shipment-core.js?check=1"
+$coreResponse.Content -match "合同号："
+
+$workerResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/service-worker.js?check=1"
+$workerResponse.Content -match "shipment-tool-static-v4"
+
 (Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/static/shipment-store.js?check=1").StatusCode
 ```
 
-预期首页返回 200、包含“在运大船”，状态模块返回 200，Service Worker 显示当前缓存版本。
+预期首页和状态模块返回 200，三个匹配结果均为 `True`。
 
 ## 当前业务规则
 

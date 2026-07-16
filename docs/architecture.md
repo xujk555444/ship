@@ -15,7 +15,7 @@ app.py                                pwa/index.html
 Legacy: web_app.py -> FastAPI -> pwa/（GitHub Pages 不使用）
 ```
 
-桌面版与 PWA 不共享运行时或存储。两套规则分别用 Python 和 JavaScript 实现，并通过对应测试保持一致。
+桌面版与 PWA 不共享运行时或存储。核心解析和累计规则分别用 Python 与 JavaScript 实现，并通过对应测试保持一致；多船管理和可选合同号是 PWA 专属能力。
 
 ## Windows 桌面版
 
@@ -29,7 +29,7 @@ Legacy: web_app.py -> FastAPI -> pwa/（GitHub Pages 不使用）
 ## iPhone PWA
 
 - `pwa/static/app.js` 负责 DOM 事件、卡片切换、自动保存、复制和运完删除。
-- `pwa/static/shipment-core.js` 负责与 Python 版对应的解析和生成规则。
+- `pwa/static/shipment-core.js` 负责与 Python 版对应的解析、累计规则，以及 PWA 专属的可选合同号输出。
 - `pwa/static/shipment-store.js` 负责多船状态的创建、选择、更新、删除和归一化。
 - `pwa/service-worker.js` 缓存静态资源，当前缓存名为 `shipment-tool-static-v4`。
 

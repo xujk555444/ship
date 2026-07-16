@@ -16,8 +16,8 @@
 
 - Python：纯仓库基线 21 条通过；本机工作树包含 3 条未跟踪卸船测试时为 24 条通过。
 - Node：`node --test tests\test_shipment_core.mjs tests\test_shipment_store.mjs`，18 条通过。
-- Git：发布后 `main` 应与 `origin/main` 对齐。
-- 线上：主页返回 200，并包含“在运大船”。
+- Git：`main` 与 `origin/main` 对齐；功能提交 `7ebbf4c` 已推送。
+- 线上：主页及静态模块返回 200，合同号字段、合同号模板和 `shipment-tool-static-v4` 均已发布。
 - D 盘桌面 EXE 已启动验证，卸船 EXE 已在 D 盘重新构建。
 
 ## 已知边界
@@ -30,6 +30,6 @@
 
 ## 后续修改原则
 
-- 改业务规则时同步修改 Python 与 JavaScript 实现，并同时更新两套测试。
+- 改共享解析或累计规则时同步修改 Python 与 JavaScript 实现，并更新两套测试；PWA 专属能力只改 JavaScript 和 Node 测试。
 - 改 PWA 静态资源时更新 Service Worker 缓存名和资源清单。
 - 发布前明确暂存文件，不使用会吞入未跟踪文件的批量暂存命令。

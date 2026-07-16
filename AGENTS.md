@@ -6,12 +6,12 @@
 - Windows 桌面入口是 `app.py`，业务规则集中在 `shipment_tool.py`。
 - 手机入口是静态 PWA：`pwa/index.html`、`pwa/static/app.js`、`pwa/static/shipment-core.js`、`pwa/static/shipment-store.js`。
 - `web_app.py` 是保留的旧 FastAPI 入口；GitHub Pages 不依赖 Python 后端或 Render。
-- 桌面版与 PWA 规则一致，但状态独立，不做跨设备同步。
+- 桌面版与 PWA 的核心解析和累计规则一致，但状态独立，不做跨设备同步；可选合同号仅 PWA 支持。
 
 ## Invariants
 
 - 原始文本中的流向必须忽略，输出只使用当前选中状态的流向。
-- 桌面版维持单大船状态；PWA 支持多条大船，每条船独立保存累计和草稿。
+- 桌面版维持单大船状态；PWA 支持多条大船，每条船独立保存合同号、累计和草稿。
 - 第一船累计等于本次报装数，后续船次累加；超过 80000 吨才触发运完提醒。
 - PWA 状态结构为 `shipment-pwa-state-v3`；不要无意恢复 v2 数据迁移。
 - 复制结果保持静默，生成结果保持可编辑。

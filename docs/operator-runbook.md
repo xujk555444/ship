@@ -37,7 +37,7 @@ python -m unittest discover -s tests -v
 node --test tests\test_shipment_core.mjs tests\test_shipment_store.mjs
 ```
 
-`git fsck` 中已知的 dangling tree 是未引用对象，不代表仓库损坏；命令退出码为 0 才算通过。纯仓库 Python 基线为 21 条；本机工作树包含 3 条未跟踪卸船测试时为 24 条。
+`git fsck` 中已知的 dangling tree 是未引用对象，不代表仓库损坏；命令退出码为 0 才算通过。纯仓库 Python 基线为 21 条；本机工作树包含 3 条未跟踪卸船测试时为 24 条。Node 基线为 18 条。
 
 本地检查静态 PWA：
 
@@ -76,10 +76,18 @@ git push origin main
 线上冒烟：
 
 ```powershell
-$r = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/?check=1"
-$r.StatusCode
-$r.Content -match "在运大船"
+$pageResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/?check=1"
+$pageResponse.StatusCode
+$pageResponse.Content -match 'id="contractInput"'
+
+$coreResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/static/shipment-core.js?check=1"
+$coreResponse.Content -match "合同号："
+
+$workerResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/service-worker.js?check=1"
+$workerResponse.Content -match "shipment-tool-static-v4"
 ```
+
+预期状态码为 200，三个匹配结果均为 `True`。
 
 ## iPhone 安装与更新
 
