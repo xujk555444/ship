@@ -91,6 +91,22 @@ $workerResponse.Content -match "shipment-tool-static-v4"
 
 预期状态码为 200，三个匹配结果均为 `True`。
 
+## V1.0 稳定回滚点
+
+- Git 注释标签：`V1.0`，对应提交 `b46f26b`。
+- 离线只读基线：`D:\Projects\ship-backups\V1.0`。
+- 完整恢复范围和数据保护步骤：`docs/ROLLBACK.md`。
+
+日常只读核验：
+
+```powershell
+git rev-parse "V1.0^{commit}"
+git ls-remote --tags origin "refs/tags/V1.0" "refs/tags/V1.0^{}"
+Get-FileHash -Algorithm SHA256 "D:\Projects\ship-backups\V1.0\source-v1.0.zip"
+```
+
+预期标签提交为 `b46f26b49d827d795d96ed2cdaf1b36e397c13e1`，源码包 SHA-256 为 `BFA117072011847700ED9A0122494A8B50571E5A57C84D3DFBE2DD18FFA36004`。不要修改、覆盖或重新生成 V1.0 备份；真正回滚前必须阅读 `docs/ROLLBACK.md`。
+
 ## iPhone 安装与更新
 
 - Safari 打开线上地址，选择“添加到主屏幕”。
