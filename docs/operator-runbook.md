@@ -39,6 +39,8 @@ node --test tests\test_shipment_core.mjs tests\test_shipment_store.mjs
 
 `git fsck` 中已知的 dangling tree 是未引用对象，不代表仓库损坏；命令退出码为 0 才算通过。纯仓库 Python 基线为 21 条；本机工作树包含 3 条未跟踪卸船测试时为 24 条。Node 基线为 18 条。
 
+`.github/workflows/blank.yml` 当前是 GitHub 示例工作流，只执行 `echo`，不会运行 Python 或 Node 测试。发布前必须执行上面的本地测试，不能只依据 GitHub 的绿色 `CI` 状态。
+
 本地检查静态 PWA：
 
 ```powershell

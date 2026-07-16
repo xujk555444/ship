@@ -27,6 +27,8 @@ node --test tests\test_shipment_core.mjs tests\test_shipment_store.mjs
 
 PWA 资源或 Service Worker 改动还应启动静态服务器，检查首页、manifest、Service Worker 和所有静态模块返回 200。
 
+`.github/workflows/blank.yml` 当前只是示例 CI，只执行 `echo`；GitHub 上的绿色 `CI` 不能替代上述本地测试。
+
 ## Deployment And Paths
 
 - `main` 推送后由 `.github/workflows/pages.yml` 发布 `pwa/`。

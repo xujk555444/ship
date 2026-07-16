@@ -25,6 +25,7 @@
 - 桌面版仍是单大船状态；多船管理和合同号只在手机 PWA。
 - 桌面与手机状态独立，没有账号、云同步或后端数据库。
 - `web_app.py`、`render.yaml` 和 `requirements-web.txt` 是旧后端方案，Pages 发布不使用。
+- `.github/workflows/blank.yml` 是只执行 `echo` 的示例 CI，不提供自动测试保障。
 - Service Worker 使用 cache-first；发布后已打开的 iPhone Web App 可能需要彻底关闭后重开。
 - 工作区存在三个未跟踪文件：`build_auto_unload_exe.bat`、`build_auto_unload_exe.ps1`、`tests/test_unload_processor.py`。它们已随 D 盘项目保留，不应在无审查时删除或批量提交。
 
