@@ -18,6 +18,7 @@ const elements = {
   workspace: document.querySelector("#workspace"),
   addShipButton: document.querySelector("#addShipButton"),
   bigShipInput: document.querySelector("#bigShipInput"),
+  contractInput: document.querySelector("#contractInput"),
   flowInput: document.querySelector("#flowInput"),
   totalInput: document.querySelector("#totalInput"),
   rawInput: document.querySelector("#rawInput"),
@@ -26,6 +27,7 @@ const elements = {
   saveStateButton: document.querySelector("#saveStateButton"),
   completeButton: document.querySelector("#completeButton"),
   clearButton: document.querySelector("#clearButton"),
+  clearRawButton: document.querySelector("#clearRawButton"),
   generateButton: document.querySelector("#generateButton"),
   copyButton: document.querySelector("#copyButton"),
 };
@@ -66,6 +68,7 @@ function createShipId() {
 function readFormShip() {
   return {
     big_ship_no: elements.bigShipInput.value,
+    contract_no: elements.contractInput.value.trim(),
     flow: elements.flowInput.value,
     current_total: Number(elements.totalInput.value || 0),
     raw_text: elements.rawInput.value,
@@ -75,6 +78,7 @@ function readFormShip() {
 
 function writeFormShip(ship) {
   elements.bigShipInput.value = ship.big_ship_no || "";
+  elements.contractInput.value = ship.contract_no || "";
   elements.flowInput.value = ship.flow || "";
   elements.totalInput.value = ship.current_total ? String(ship.current_total) : "";
   elements.rawInput.value = ship.raw_text || "";
@@ -203,6 +207,7 @@ function generate() {
 
   const state = {
     big_ship_no: activeShip.big_ship_no.trim(),
+    contract_no: activeShip.contract_no.trim(),
     flow: activeShip.flow.trim(),
     current_total: activeShip.current_total,
   };
@@ -292,6 +297,17 @@ function clearText() {
   setStatus("已清空当前大船的输入和结果。");
 }
 
+function clearRawText() {
+  if (!getActiveShip(store)) {
+    setStatus("请先新增一条大船。", "error");
+    return;
+  }
+
+  elements.rawInput.value = "";
+  persistActiveShip();
+  setStatus("已清空当前大船的原始信息。");
+}
+
 function installServiceWorker() {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./service-worker.js").catch(() => {
@@ -311,10 +327,11 @@ function bindEvents() {
   elements.saveStateButton.addEventListener("click", saveCurrentShip);
   elements.completeButton.addEventListener("click", () => completeRun(false));
   elements.clearButton.addEventListener("click", clearText);
+  elements.clearRawButton.addEventListener("click", clearRawText);
   elements.generateButton.addEventListener("click", generate);
   elements.copyButton.addEventListener("click", copyOutput);
 
-  [elements.bigShipInput, elements.flowInput, elements.totalInput].forEach((input) => {
+  [elements.bigShipInput, elements.contractInput, elements.flowInput, elements.totalInput].forEach((input) => {
     input.addEventListener("input", () => persistActiveShip(true));
   });
   [elements.rawInput, elements.outputText].forEach((input) => {

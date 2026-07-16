@@ -31,7 +31,7 @@ Legacy: web_app.py -> FastAPI -> pwa/（GitHub Pages 不使用）
 - `pwa/static/app.js` 负责 DOM 事件、卡片切换、自动保存、复制和运完删除。
 - `pwa/static/shipment-core.js` 负责与 Python 版对应的解析和生成规则。
 - `pwa/static/shipment-store.js` 负责多船状态的创建、选择、更新、删除和归一化。
-- `pwa/service-worker.js` 缓存静态资源，当前缓存名为 `shipment-tool-static-v3`。
+- `pwa/service-worker.js` 缓存静态资源，当前缓存名为 `shipment-tool-static-v4`。
 
 本地状态键为 `shipment-pwa-state-v3`：
 
@@ -40,18 +40,18 @@ Legacy: web_app.py -> FastAPI -> pwa/（GitHub Pages 不使用）
   version: 3,
   activeShipId,
   ships: [
-    { id, big_ship_no, flow, current_total, raw_text, output_text }
+    { id, big_ship_no, contract_no, flow, current_total, raw_text, output_text }
   ]
 }
 ```
 
-每条大船的累计、原始输入和生成结果彼此隔离。旧的 `shipment-pwa-state-v2` 在初始化时删除，不迁移为多船数据。
+每条大船的合同号、累计、原始输入和生成结果彼此隔离。现有 v3 数据缺少合同号时按空值读取；旧的 `shipment-pwa-state-v2` 在初始化时删除，不迁移为多船数据。
 
 ## 业务数据流
 
-1. 用户选择大船，并填写该船的大船号与流向。
+1. 用户选择大船，并填写该船的大船号、流向与可选合同号。
 2. 解析器从原始信息提取小船号、报装吨数、电话和船期；原始流向不进入解析结果。
-3. 生成器用当前大船状态构建固定模板，并更新该船累计。
+3. 生成器用当前大船状态构建固定模板；合同号非空时插入合同号行，并更新该船累计。
 4. 状态立即保存到当前客户端本地。
 5. 累计超过 80000 吨时提示运完；确认后桌面版清空状态，PWA 删除当前船卡。
 

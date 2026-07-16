@@ -40,7 +40,7 @@ git push origin main
 - `pwa/static/shipment-store.js`
 - `pwa/static/styles.css`
 
-Service Worker 当前缓存名是 `shipment-tool-static-v3`。新增或删除静态资源时必须同步更新缓存清单和缓存名。
+Service Worker 当前缓存名是 `shipment-tool-static-v4`。新增或删除静态资源时必须同步更新缓存清单和缓存名。
 
 ## iPhone 使用与更新
 
@@ -66,7 +66,8 @@ $home.Content -match "在运大船"
 ## 当前业务规则
 
 - 流向只读取当前选中大船状态，忽略原始文本流向。
-- 每条 PWA 大船分别保存累计、原始输入和生成结果。
+- 每条 PWA 大船分别保存合同号、累计、原始输入和生成结果。
+- 合同号非空时在大船号后生成合同号行，空值时保持原格式。
 - 第一船累计等于报装数，后续船次递增。
 - 累计超过 80000 吨时提醒是否运完。
 - 独立 11 位手机号自动识别为电话。

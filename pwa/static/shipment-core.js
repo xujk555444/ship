@@ -3,7 +3,7 @@ export const CARRIER = "广东省新能航运有限公司/船管公司";
 export const TONNAGE_REMINDER_THRESHOLD = 80000;
 
 export function resetState() {
-  return { big_ship_no: "", flow: "", current_total: 0 };
+  return { big_ship_no: "", contract_no: "", flow: "", current_total: 0 };
 }
 
 export function parseMessage(rawText, now = new Date()) {
@@ -20,10 +20,12 @@ export function parseMessage(rawText, now = new Date()) {
 export function buildOutput(parsed, state) {
   const currentTotal = toInt(state.current_total);
   const newTotal = currentTotal <= 0 ? parsed.amount : currentTotal + parsed.amount;
+  const contractNo = String(state.contract_no || "").trim();
   const lines = [
     `委托公司：${COMPANY}`,
     `承运公司:${CARRIER}`,
     `大船号:${state.big_ship_no}`,
+    ...(contractNo ? [`合同号：${contractNo}`] : []),
     `船号:${parsed.ship_no}`,
     `报装${parsed.amount}吨`,
     `累积${newTotal}吨`,
@@ -37,6 +39,7 @@ export function buildOutput(parsed, state) {
 export function generateShipment(rawText, state, now = new Date()) {
   const normalizedState = {
     big_ship_no: String(state.big_ship_no || "").trim(),
+    contract_no: String(state.contract_no || "").trim(),
     flow: String(state.flow || "").trim(),
     current_total: toInt(state.current_total),
   };

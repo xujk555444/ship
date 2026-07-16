@@ -46,6 +46,37 @@ test("每条大船分别保存原始信息和生成结果", () => {
   );
 });
 
+test("每条大船分别保存合同号", () => {
+  let store = addShip(createEmptyStore(), "ship-a");
+  store = updateShip(store, "ship-a", { contract_no: " CONTRACT-A " });
+  store = addShip(store, "ship-b");
+  store = updateShip(store, "ship-b", { contract_no: "CONTRACT-B" });
+
+  assert.deepEqual(store.ships.map((ship) => ship.contract_no), ["CONTRACT-A", "CONTRACT-B"]);
+});
+
+test("现有 v3 数据缺少合同号时自动使用空值", () => {
+  const store = parseStore(JSON.stringify({
+    version: STORE_VERSION,
+    activeShipId: "ship-a",
+    ships: [
+      {
+        id: "ship-a",
+        big_ship_no: "九华真诚",
+        flow: "高栏—都骑",
+        current_total: 3200,
+        raw_text: "原文",
+        output_text: "结果",
+      },
+    ],
+  }));
+
+  assert.equal(store.ships[0].contract_no, "");
+  assert.equal(store.ships[0].current_total, 3200);
+  assert.equal(store.ships[0].raw_text, "原文");
+  assert.equal(store.ships[0].output_text, "结果");
+});
+
 test("切换大船后返回对应状态", () => {
   let store = addShip(createEmptyStore(), "ship-a");
   store = updateShip(store, "ship-a", { big_ship_no: "大船 A" });

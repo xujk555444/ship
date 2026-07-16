@@ -15,6 +15,7 @@ export function createShip(id) {
   return {
     id: normalizedId,
     big_ship_no: "",
+    contract_no: "",
     flow: "",
     current_total: 0,
     raw_text: "",
@@ -124,6 +125,7 @@ function normalizeShip(value) {
   return {
     id,
     big_ship_no: String(value.big_ship_no || ""),
+    contract_no: String(value.contract_no || "").trim(),
     flow: String(value.flow || ""),
     current_total: Number.isFinite(total) ? Math.trunc(total) : 0,
     raw_text: String(value.raw_text || ""),
