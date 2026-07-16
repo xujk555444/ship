@@ -34,5 +34,6 @@ PWA 资源或 Service Worker 改动还应启动静态服务器，检查首页、
 - `main` 推送后由 `.github/workflows/pages.yml` 发布 `pwa/`。
 - 线上地址是 `https://xujk555444.github.io/ship/`。
 - Git 远端使用 `ssh://git@ssh.github.com:443/xujk555444/ship.git`。
+- `V1.0` 是稳定回滚标签，离线只读基线位于 `D:\Projects\ship-backups\V1.0`；恢复前必须阅读 `docs/ROLLBACK.md`。
 - 构建与启动脚本必须基于 `%~dp0` 或 `$PSScriptRoot`，避免绑定本机项目绝对路径。
 - `build/`、`dist/`、`*.spec`、`shipment_state.json` 和 `*.xlsx` 被 Git 忽略；不要用清理命令误删用户运行数据或已构建 EXE。

@@ -54,3 +54,4 @@ python -m pip install pyinstaller
 - [架构说明](docs/architecture.md)
 - [运维手册](docs/operator-runbook.md)
 - [交接状态](docs/handoff.md)
+- [V1.0 回滚说明](docs/ROLLBACK.md)
