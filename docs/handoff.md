@@ -1,8 +1,10 @@
 # 项目交接状态
 
-状态日期：2026-07-16
+状态日期：2026-09-08
 
 ## 已具备能力
+
+- 手机 PWA 新增“取消计划/计划取消”扣减与重复确认；现有 v3 数据和合同号兼容保留，取消记录仅从本次升级后开始。
 
 - Windows PySide6 桌面版可从源码运行，也可使用 `dist/ShipmentMessageTool.exe`。
 - iPhone 静态 PWA 已部署到 `https://xujk555444.github.io/ship/`。
@@ -16,9 +18,9 @@
 ## 验证基线
 
 - Python：纯仓库基线 21 条通过；本机工作树包含 3 条未跟踪卸船测试时为 24 条通过。
-- Node：`node --test tests\test_shipment_core.mjs tests\test_shipment_store.mjs`，18 条通过。
-- Git：本地与远端稳定标签 `V1.0` 均固定在提交 `b46f26b`；标签之后仅有知识同步，不包含业务代码变更。
-- 线上：主页及静态模块返回 200，合同号字段、合同号模板和 `shipment-tool-static-v4` 均已发布。
+- Node：`node --test tests\test_shipment_core.mjs tests\test_shipment_store.mjs`，23 条通过；另用浏览器检查重复确认、保存失败重试与离线重开。
+- Git：本地与远端稳定标签 `V1.0` 均固定在提交 `b46f26b`；取消功能位于后续提交，不移动该标签。
+- 线上：主页及静态模块返回 200，合同号字段、合同号模板和 `shipment-tool-static-v5` 均已发布。
 - D 盘桌面 EXE 已启动验证，卸船 EXE 已在 D 盘重新构建。
 
 ## 已知边界

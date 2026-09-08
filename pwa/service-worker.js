@@ -1,4 +1,4 @@
-const CACHE_NAME = "shipment-tool-static-v4";
+const CACHE_NAME = "shipment-tool-static-v5";
 const BASE_URL = new URL("./", self.registration.scope);
 const ASSETS = [
   "",

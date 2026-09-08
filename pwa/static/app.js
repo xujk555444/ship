@@ -198,8 +198,8 @@ function saveCurrentShip() {
 }
 
 function generate() {
-  persistActiveShip();
-  const activeShip = getActiveShip(store);
+  const savedShip = getActiveShip(store);
+  const activeShip = savedShip ? { ...savedShip, ...readFormShip() } : null;
   if (!activeShip) {
     setStatus("请先新增一条大船。", "error");
     return;
@@ -213,19 +213,35 @@ function generate() {
   };
 
   try {
-    const { output, state: updatedState, reminderRequired } = generateShipment(
+    const { output, state: updatedState, reminderRequired, cancellationKey, parsed } = generateShipment(
       activeShip.raw_text.trim(),
       state,
     );
-    store = updateShip(store, activeShip.id, {
+    if (cancellationKey && activeShip.cancellation_keys.includes(cancellationKey)) {
+      const confirmed = window.confirm(
+        `该船相同吨数已取消过，是否再次扣减？\n大船：${state.big_ship_no}\n小船：${parsed.ship_no}\n扣减：${parsed.amount}吨\n累计：${state.current_total} → ${updatedState.current_total}吨`,
+      );
+      if (!confirmed) return;
+    }
+    const nextStore = updateShip(store, activeShip.id, {
       ...updatedState,
       raw_text: activeShip.raw_text,
       output_text: output,
+      cancellation_keys: cancellationKey
+        ? [...new Set([...activeShip.cancellation_keys, cancellationKey])]
+        : activeShip.cancellation_keys,
     });
-    persistStore();
+    // Commit the total, output and cancellation record together before updating the UI.
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextStore));
+    } catch {
+      setStatus("无法保存到本机，本次生成未生效，请重试。", "error");
+      return;
+    }
+    store = nextStore;
     writeFormShip(getActiveShip(store));
     renderShipCards();
-    setStatus("结果已生成并保存到当前大船。", "success");
+    setStatus(cancellationKey ? `已取消${parsed.ship_no}，扣减${parsed.amount}吨并保存。` : "结果已生成并保存到当前大船。", "success");
 
     if (reminderRequired) {
       const updatedShip = getActiveShip(store);

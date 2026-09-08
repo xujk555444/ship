@@ -20,6 +20,7 @@ export function createShip(id) {
     current_total: 0,
     raw_text: "",
     output_text: "",
+    cancellation_keys: [],
   };
 }
 
@@ -130,5 +131,8 @@ function normalizeShip(value) {
     current_total: Number.isFinite(total) ? Math.trunc(total) : 0,
     raw_text: String(value.raw_text || ""),
     output_text: String(value.output_text || ""),
+    cancellation_keys: Array.isArray(value.cancellation_keys)
+      ? [...new Set(value.cancellation_keys.filter((key) => typeof key === "string"))]
+      : [],
   };
 }

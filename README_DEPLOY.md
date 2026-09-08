@@ -40,7 +40,7 @@ git push origin main
 - `pwa/static/shipment-store.js`
 - `pwa/static/styles.css`
 
-Service Worker 当前缓存名是 `shipment-tool-static-v4`。新增或删除静态资源时必须同步更新缓存清单和缓存名。
+Service Worker 当前缓存名是 `shipment-tool-static-v5`。新增或删除静态资源时必须同步更新缓存清单和缓存名。
 
 ## iPhone 使用与更新
 
@@ -62,7 +62,7 @@ $coreResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io
 $coreResponse.Content -match "合同号："
 
 $workerResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/service-worker.js?check=1"
-$workerResponse.Content -match "shipment-tool-static-v4"
+$workerResponse.Content -match "shipment-tool-static-v5"
 
 (Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/static/shipment-store.js?check=1").StatusCode
 ```

@@ -1,6 +1,43 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+const cancelState = { big_ship_no: "华源", flow: "高栏-都骑", contract_no: "HCCK2600167", current_total: 49700 };
+
+test("两种取消关键词及标点均扣减，简短消息不使用原始流向", () => {
+  for (const keyword of ["取消计划", "计划取消", "取消计划!", "计划取消！"]) {
+    const result = generateShipment(`船号:桂平海宏8888\n报装:3000\n电话:15875834439\n流向:海昌到都骑\n${keyword}`, cancelState);
+    assert.equal(result.newTotal, 46700);
+    assert.match(result.output, /流向：高栏-都骑\n计划取消$/u);
+    assert.equal(result.cancellationKey, JSON.stringify(["桂平海宏8888", 3000]));
+  }
+});
+
+test("完整取消模板区分大小船并忽略旧累计", () => {
+  const raw = "委托公司：广东粤电云河发电有限公司\n承运公司:广东省新能航运有限公司/船管公司\n大船号:华源\n船号:大福8988\n报装3900吨\n累积99999吨\n电话18577406868\n船期：9月7日\n流向：高栏-都骑\n计划取消";
+  const result = generateShipment(raw, cancelState);
+  assert.equal(result.newTotal, 45800);
+  assert.equal(result.parsed.ship_no, "大福8988");
+  assert.match(result.output, /合同号：HCCK2600167/u);
+  assert.match(result.output, /累积45800吨/u);
+  assert.throws(() => generateShipment(raw, { ...cancelState, big_ship_no: "其他船" }), /大船号/u);
+  assert.equal(generateShipment(raw.replace("计划取消", ""), cancelState).parsed.ship_no, "大福8988");
+});
+
+test("取消到零且不触发运完提示", () => {
+  const raw = "船号:大福8988\n报装3900吨\n计划取消";
+  assert.equal(generateShipment(raw, { ...cancelState, current_total: 3900 }).newTotal, 0);
+  assert.equal(generateShipment(raw, { ...cancelState, current_total: 90000 }).reminderRequired, false);
+  assert.throws(() => generateShipment(raw, { ...cancelState, current_total: 3899 }), /超过/u);
+});
+
+test("无效取消消息不得改变传入状态", () => {
+  const snapshot = structuredClone(cancelState);
+  for (const raw of ["大船号:华源\n报装3000吨\n计划取消", "船号:\n报装3000吨\n计划取消", ...["0", "-3", "3.5", "3000abc", ""].map((amount) => `船号:大福8988\n报装${amount}吨\n取消计划`)]) {
+    assert.throws(() => generateShipment(raw, cancelState));
+    assert.deepEqual(cancelState, snapshot);
+  }
+});
+
 import {
   COMPANY,
   CARRIER,

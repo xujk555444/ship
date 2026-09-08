@@ -31,7 +31,7 @@ Legacy: web_app.py -> FastAPI -> pwa/（GitHub Pages 不使用）
 - `pwa/static/app.js` 负责 DOM 事件、卡片切换、自动保存、复制和运完删除。
 - `pwa/static/shipment-core.js` 负责与 Python 版对应的解析、累计规则，以及 PWA 专属的可选合同号输出。
 - `pwa/static/shipment-store.js` 负责多船状态的创建、选择、更新、删除和归一化。
-- `pwa/service-worker.js` 缓存静态资源，当前缓存名为 `shipment-tool-static-v4`。
+- `pwa/service-worker.js` 缓存静态资源，当前缓存名为 `shipment-tool-static-v5`。
 
 本地状态键为 `shipment-pwa-state-v3`：
 
@@ -40,7 +40,7 @@ Legacy: web_app.py -> FastAPI -> pwa/（GitHub Pages 不使用）
   version: 3,
   activeShipId,
   ships: [
-    { id, big_ship_no, contract_no, flow, current_total, raw_text, output_text }
+    { id, big_ship_no, contract_no, flow, current_total, raw_text, output_text, cancellation_keys }
   ]
 }
 ```
@@ -48,6 +48,8 @@ Legacy: web_app.py -> FastAPI -> pwa/（GitHub Pages 不使用）
 每条大船的合同号、累计、原始输入和生成结果彼此隔离。现有 v3 数据缺少合同号时按空值读取；旧的 `shipment-pwa-state-v2` 在初始化时删除，不迁移为多船数据。
 
 ## 业务数据流
+
+PWA 识别“取消计划/计划取消”后从当前累计扣减报装吨数，忽略原文旧累计。`cancellation_keys` 默认空数组，以 JSON 编码的 `[规范化小船名, 整数吨数]` 判重，重复需确认；清空文本及普通报装均保留记录，删除大船才移除。旧 v3 数据兼容读取。扣减前校验大船号和余额，累计、结果、记录一次写入 localStorage，失败不提交界面状态。取消不触发运完提醒。
 
 1. 用户选择大船，并填写该船的大船号、流向与可选合同号。
 2. 解析器从原始信息提取小船号、报装吨数、电话和船期；原始流向不进入解析结果。

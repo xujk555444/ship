@@ -14,12 +14,15 @@ export function parseMessage(rawText, now = new Date()) {
     phone: extractPhone(text),
     flow: "",
     schedule: extractSchedule(text, now),
+    isCancellation: /取消计划|计划取消/u.test(text),
   };
 }
 
 export function buildOutput(parsed, state) {
   const currentTotal = toInt(state.current_total);
-  const newTotal = currentTotal <= 0 ? parsed.amount : currentTotal + parsed.amount;
+  const newTotal = parsed.isCancellation
+    ? currentTotal - parsed.amount
+    : currentTotal <= 0 ? parsed.amount : currentTotal + parsed.amount;
   const contractNo = String(state.contract_no || "").trim();
   const lines = [
     `委托公司：${COMPANY}`,
@@ -32,6 +35,7 @@ export function buildOutput(parsed, state) {
     `电话${parsed.phone}`,
     `船期：${parsed.schedule}`,
     `流向：${state.flow}`,
+    ...(parsed.isCancellation ? ["计划取消"] : []),
   ];
   return { output: lines.join("\n"), newTotal };
 }
@@ -56,12 +60,34 @@ export function generateShipment(rawText, state, now = new Date()) {
   }
 
   const parsed = parseMessage(normalizedText, now);
+  let cancellationKey = null;
+  if (parsed.isCancellation) {
+    const explicitShip = normalizedText.match(/(?:^|\n)[ \t]*(?:小船号|船号|船名)[ \t]*[:：]?[ \t]*([^\r\n]+)/u)
+      || normalizedText.match(/@([^\s,，、]+)/u);
+    if (!explicitShip || !normalizeShipNo(explicitShip[1]).replace(/[:：\s]/gu, "")) {
+      throw new Error("取消计划必须明确填写小船号或船名。");
+    }
+    parsed.ship_no = normalizeShipNo(explicitShip[1]);
+    const amountToken = normalizedText.match(/(?:报装|计划装|装煤|装)[ \t]*[:：]?[ \t]*([^\s吨]+)/u)?.[1];
+    if (!amountToken || !/^\d+$/u.test(amountToken) || !Number.isSafeInteger(parsed.amount) || parsed.amount <= 0) {
+      throw new Error("取消吨数必须为正整数。");
+    }
+    const bigShip = normalizedText.match(/(?:^|\n)[ \t]*大船号[ \t]*[:：]?[ \t]*([^\r\n]*)/u);
+    if (bigShip && bigShip[1].trim() !== normalizedState.big_ship_no) {
+      throw new Error("取消信息的大船号与当前大船不一致，请切换到对应大船。");
+    }
+    if (!Number.isSafeInteger(Number(state.current_total)) || Number(state.current_total) < parsed.amount) {
+      throw new Error("取消吨数超过当前累计，或当前累计无效。");
+    }
+    cancellationKey = JSON.stringify([parsed.ship_no, parsed.amount]);
+  }
   const { output, newTotal } = buildOutput(parsed, normalizedState);
   return {
     parsed,
     output,
     newTotal,
-    reminderRequired: newTotal > TONNAGE_REMINDER_THRESHOLD,
+    cancellationKey,
+    reminderRequired: !parsed.isCancellation && newTotal > TONNAGE_REMINDER_THRESHOLD,
     state: {
       ...normalizedState,
       current_total: newTotal,
@@ -84,7 +110,7 @@ export function extractShipNo(text) {
     return normalizeShipNo(atMatch[1].trim());
   }
 
-  const labelMatch = text.match(/(?:船号|船名)\s*[:：]?\s*([^\r\n]+)/u);
+  const labelMatch = text.match(/(?:^|\n)[ \t]*(?:小船号|船号|船名)[ \t]*[:：]?[ \t]*([^\r\n]+)/u);
   if (labelMatch) {
     return normalizeShipNo(labelMatch[1].trim());
   }

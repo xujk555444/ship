@@ -1,6 +1,21 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
+test("取消记录兼容旧数据，跨重载保留且各船隔离", () => {
+  let store = addShip(createEmptyStore(), "a");
+  assert.deepEqual(getActiveShip(store).cancellation_keys, []);
+  store = updateShip(store, "a", { cancellation_keys: ['["大福8988",3900]'], current_total: 45800 });
+  store = addShip(store, "b");
+  assert.deepEqual(getActiveShip(store).cancellation_keys, []);
+  store = selectShip(parseStore(JSON.stringify(store)), "a");
+  store = updateShip(store, "a", { raw_text: "", output_text: "" });
+  assert.deepEqual(getActiveShip(store).cancellation_keys, ['["大福8988",3900]']);
+  assert.equal(getActiveShip(store).current_total, 45800);
+  assert.deepEqual(removeShip(store, "a").ships.map((ship) => ship.id), ["b"]);
+  const legacy = { version: 3, activeShipId: "old", ships: [{ id: "old", current_total: 99 }] };
+  assert.deepEqual(getActiveShip(parseStore(JSON.stringify(legacy))).cancellation_keys, []);
+});
+
 import {
   STORE_VERSION,
   addShip,
