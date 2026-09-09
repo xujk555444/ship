@@ -15,7 +15,7 @@ app.py                                pwa/index.html
 Legacy: web_app.py -> FastAPI -> pwa/（GitHub Pages 不使用）
 ```
 
-桌面版与 PWA 不共享运行时或存储。核心解析和累计规则分别用 Python 与 JavaScript 实现，并通过对应测试保持一致；多船管理和可选合同号是 PWA 专属能力。
+桌面版与 PWA 不共享运行时或存储，普通报装累计规则一致；多船管理、可选合同号、取消扣减与重复确认是 PWA 专属能力。完整模板中大小船号的识别修复仅在 JavaScript 实现。
 
 ## Windows 桌面版
 

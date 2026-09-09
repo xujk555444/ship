@@ -7,7 +7,13 @@
 - 离线备份：`D:\Projects\ship-backups\V1.0`
 - 线上 PWA：`https://xujk555444.github.io/ship/`
 
-`V1.0` 固定当前已验证的 Windows 桌面版、iPhone 多船 PWA、可选合同号和两种文本清空行为。标签和离线备份建立后不得移动、覆盖或复用该名称。
+`V1.0` 固定2026-07-16已验证的 Windows 桌面版、iPhone 多船 PWA、可选合同号和两种文本清空行为，不含2026-09-08发布的取消扣减。标签和离线备份不得移动、覆盖或复用该名称。
+
+## 取消版本回滚兼容
+
+V1.0 不识别 `cancellation_keys`，使用旧版继续保存可能移除这些记录。实际回滚前应另行备份手机现有 v3 数据，核对后再操作；保留同一个存储键不等于保留新字段。已扣减的累计不会因回滚自动加回，V1.0 会把取消文本当普通报装处理，回滚后不要再粘贴取消消息生成。
+
+重新部署回滚版本时，应在恢复的工作副本中为 Service Worker 使用从未用过的缓存名，防止复用旧缓存；不得修改标签或只读基线。回滚时优先使用正式项目中最新的回滚说明，备份内说明为建立基线时的历史版本。
 
 ## 备份范围
 
@@ -31,7 +37,7 @@
 
 ```powershell
 git fetch --tags origin
-git rev-parse V1.0^{commit}
+git rev-parse "V1.0^{commit}"
 git status --short --branch
 Get-FileHash -Algorithm SHA256 "D:\Projects\ship-backups\V1.0\source-v1.0.zip"
 ```
@@ -49,6 +55,7 @@ git pull --ff-only origin main
 $safetyBranch = "backup-before-v1.0-$(Get-Date -Format yyyyMMdd-HHmmss)"
 git branch $safetyBranch
 git restore --source V1.0 --staged --worktree -- .
+# 此处先按上文更新工作副本的 Service Worker 缓存名，并重新暂存该文件。
 git status --short
 git commit -m "Rollback project files to V1.0"
 git push origin main

@@ -6,7 +6,7 @@
 - Windows 桌面入口是 `app.py`，业务规则集中在 `shipment_tool.py`。
 - 手机入口是静态 PWA：`pwa/index.html`、`pwa/static/app.js`、`pwa/static/shipment-core.js`、`pwa/static/shipment-store.js`。
 - `web_app.py` 是保留的旧 FastAPI 入口；GitHub Pages 不依赖 Python 后端或 Render。
-- 桌面版与 PWA 的核心解析和累计规则一致，但状态独立，不做跨设备同步；可选合同号仅 PWA 支持。
+- 桌面版与 PWA 的普通报装累计规则一致，状态独立；多船、可选合同号及取消扣减仅 PWA 支持。PWA 已单独修复完整模板的大小船号识别。
 
 ## Invariants
 

@@ -60,6 +60,7 @@ $homeResponse.Content -match 'id="contractInput"'
 
 $coreResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/static/shipment-core.js?check=1"
 $coreResponse.Content -match "合同号："
+$coreResponse.Content -match "isCancellation"
 
 $workerResponse = Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/service-worker.js?check=1"
 $workerResponse.Content -match "shipment-tool-static-v5"
@@ -67,9 +68,12 @@ $workerResponse.Content -match "shipment-tool-static-v5"
 (Invoke-WebRequest -UseBasicParsing "https://xujk555444.github.io/ship/static/shipment-store.js?check=1").StatusCode
 ```
 
-预期首页和状态模块返回 200，三个匹配结果均为 `True`。
+预期首页和状态模块返回 200，四个匹配结果均为 `True`；重复确认交互按运维手册在本地测试船卡验收。
 
 ## 当前业务规则
+
+- “取消计划/计划取消”从当前大船累计扣减报装吨数；相同小船名和吨数重复取消需确认，结果末尾显示“计划取消”。
+- 每船 `cancellation_keys` 与累计一起保存；旧 v3 数据缺少该字段时使用空数组，升级前的取消无法追溯。普通报装和清空文本不清除记录。
 
 - 流向只读取当前选中大船状态，忽略原始文本流向。
 - 每条 PWA 大船分别保存合同号、累计、原始输入和生成结果。
